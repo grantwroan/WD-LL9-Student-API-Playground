@@ -55,7 +55,8 @@ async function fetchCountry() {
          ------------------------------------------------------------ */
        const API_KEY = window.API_KEY || "";
          const url =
-                  `https://api.restcountries.com/countries/v5?q=${encodeURIComponent(countryName)}`;
+                  `https://api.restcountries.com/countries/v5?q=${encodeURIComponent(countryName)}` +
+              `&response_fields=names.common,capitals,region,population,languages,flag.url_png,flag.description`;
 
        const response = await fetch(url, {
                 headers: { Authorization: `Bearer ${API_KEY}` },
