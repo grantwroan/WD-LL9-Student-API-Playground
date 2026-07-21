@@ -48,15 +48,14 @@ async function fetchCountry() {
          /* ------------------------------------------------------------
             STEP 4: Build the fetch request
             ------------------------------------------------------------
-            The old v3.1 API is retired. v5 requires an API key sent as
-            an Authorization header, and (for browser requests) your
-            API key must allow-list your origin (127.0.0.1 / localhost/ or your live preview url without the HTTPS)
-            on the API Keys page at restcountries.com.
+            v5 requires an API key sent as an Authorization header.
+            Your key lives in config.js (git-ignored, not in this repo)
+            which sets window.API_KEY before this file runs.
+            See config.example.js for the template.
          ------------------------------------------------------------ */
-       const API_KEY = "";
+       const API_KEY = window.API_KEY || "";
          const url =
-                  `https://api.restcountries.com/countries/v5?q=${encodeURIComponent(countryName)}` +
-                  `&response_fields=names.common,capitals,region,population,languages,flag.url_png,flag.description`;
+                  `https://api.restcountries.com/countries/v5?q=${encodeURIComponent(countryName)}`;
 
        const response = await fetch(url, {
                 headers: { Authorization: `Bearer ${API_KEY}` },
@@ -95,9 +94,7 @@ async function fetchCountry() {
        /* ------------------------------------------------------------
             STEP 7: Display the Flag
             ------------------------------------------------------------
-            - flag image lives at: country.flag.url_png (v5 field)
-            - Set flagImg.src to that URL
-            - Set flagImg.alt to something descriptive
+            Confirmed from a real v5 response: country.flag.url_png
          ------------------------------------------------------------ */
        flagImg.src = country.flag.url_png;
          flagImg.alt = `Flag of ${country.names.common}`;
@@ -105,25 +102,25 @@ async function fetchCountry() {
        /* ------------------------------------------------------------
             STEP 8: Display Capital, Region, Population
             ------------------------------------------------------------
-            - Capital: country.capitals[0] <-- v5 uses "capitals" (ARRAY)
-            - Region: country.region
-            - Population: country.population <-- a raw number
-              number.toLocaleString() formats 129000000 as "129,000,000"
+            Confirmed from a real v5 response:
+            - country.capitals is an ARRAY OF OBJECTS: capitals[0].name
+            - country.region is a plain string
+            - country.population is a raw number
          ------------------------------------------------------------ */
-       capitalEl.textContent = country.capitals[0];
+       capitalEl.textContent = country.capitals[0].name;
          regionEl.textContent = country.region;
          populationEl.textContent = country.population.toLocaleString();
 
        /* ------------------------------------------------------------
             STEP 9: Display Languages
             ------------------------------------------------------------
-            - country.languages is an OBJECT, not an array, e.g.:
-              { fra: "French", eng: "English" }
-            - Object.values(country.languages) turns that into an
-              array of names: ["French", "English"]
-            - .join(", ") turns that array into one readable string
+            Confirmed from a real v5 response: country.languages is an
+            ARRAY of objects (not a map), each with a .name property, e.g.:
+            [{ name: "English", ... }, { name: "French", ... }]
          ------------------------------------------------------------ */
-       languagesEl.textContent = Object.values(country.languages).join(", ");
+       languagesEl.textContent = country.languages
+           .map(function (lang) { return lang.name; })
+           .join(", ");
 
        /* ------------------------------------------------------------
             STEP 10a: Improve the experience — clean up on SUCCESS
