@@ -79,6 +79,7 @@ async function fetchCountry() {
        }
 
        const country = objects[0];
+     console.log(country);
 
        /* ------------------------------------------------------------
             STEP 6: Display ONE property. Start simple.
